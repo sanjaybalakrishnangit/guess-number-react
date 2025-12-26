@@ -14,6 +14,7 @@ function Game() {
     reset: new Audio("/sounds/reset.mp3")
   }
 
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light")
   const [level, setLevel] = useState("Medium")
   const [number, setNumber] = useState(Math.floor(Math.random() * difficulties.Medium.max) + 1)
   const [guess, setGuess] = useState("")
@@ -26,6 +27,11 @@ function Game() {
 
   const maxAttempts = difficulties[level].attempts
   const maxRange = difficulties[level].max
+
+  useEffect(() => {
+    document.body.className = theme
+    localStorage.setItem("theme", theme)
+  }, [theme])
 
   useEffect(() => {
     if (gameOver) return
@@ -103,7 +109,12 @@ function Game() {
 
   return (
     <div className="card">
-      <h2>Guess The Number</h2>
+      <div className="top">
+        <h2>Guess The Number</h2>
+        <button className="theme-btn" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+          {theme === "light" ? "🌙" : "☀️"}
+        </button>
+      </div>
 
       <select value={level} onChange={(e) => resetGame(e.target.value)}>
         <option>Easy</option>
@@ -112,9 +123,7 @@ function Game() {
       </select>
 
       <p className="range">Between 1 and {maxRange}</p>
-      <p className={`timer ${timeLeft <= 10 ? "danger" : ""}`}>
-        Time Left: {timeLeft}s
-      </p>
+      <p className={`timer ${timeLeft <= 10 ? "danger" : ""}`}>Time Left: {timeLeft}s</p>
 
       <input
         type="number"
@@ -126,15 +135,11 @@ function Game() {
       <button onClick={checkGuess} disabled={gameOver}>Guess</button>
       <button className="reset" onClick={() => resetGame(level)}>Reset</button>
 
-      <p className={`message ${message.includes("Won") ? "win" : "lose"}`}>
-        {message}
-      </p>
+      <p className={`message ${message.includes("Won") ? "win" : "lose"}`}>{message}</p>
 
       {!gameOver && <p className="hint">{hint}</p>}
 
-      <p className="attempts">
-        Attempts: {attempts} / {maxAttempts}
-      </p>
+      <p className="attempts">Attempts: {attempts} / {maxAttempts}</p>
 
       {history.length > 0 && (
         <div className="history">
