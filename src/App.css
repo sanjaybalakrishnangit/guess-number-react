@@ -132,3 +132,10 @@ body.dark .card {
   font-size: 18px;
   cursor: pointer;
 }
+.card {
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}

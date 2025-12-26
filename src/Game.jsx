@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
+import confetti from "canvas-confetti"
+
 
 function Game() {
   const difficulties = {
@@ -44,7 +47,7 @@ function Game() {
     }
 
     const timer = setInterval(() => {
-      setTimeLeft((t) => t - 1)
+      setTimeLeft(t => t - 1)
     }, 1000)
 
     return () => clearInterval(timer)
@@ -67,13 +70,21 @@ function Game() {
     setHistory([...history, userGuess])
 
     if (userGuess === number) {
-      setMessage("Correct! You Won 🎉")
-      setHint("")
-      setGameOver(true)
-      sounds.correct.play()
-      setGuess("")
-      return
-    }
+  setMessage("Correct! You Won 🎉")
+  setHint("")
+  setGameOver(true)
+  sounds.correct.play()
+
+  confetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 }
+  })
+
+  setGuess("")
+  return
+}
+
 
     if (newAttempts === maxAttempts) {
       setMessage("Game Over! Number was " + number)
@@ -108,7 +119,12 @@ function Game() {
   }
 
   return (
-    <div className="card">
+    <motion.div
+      className="card"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="top">
         <h2>Guess The Number</h2>
         <button className="theme-btn" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
@@ -123,7 +139,9 @@ function Game() {
       </select>
 
       <p className="range">Between 1 and {maxRange}</p>
-      <p className={`timer ${timeLeft <= 10 ? "danger" : ""}`}>Time Left: {timeLeft}s</p>
+      <p className={`timer ${timeLeft <= 10 ? "danger" : ""}`}>
+        Time Left: {timeLeft}s
+      </p>
 
       <input
         type="number"
@@ -132,26 +150,57 @@ function Game() {
         onChange={(e) => setGuess(e.target.value)}
       />
 
-      <button onClick={checkGuess} disabled={gameOver}>Guess</button>
-      <button className="reset" onClick={() => resetGame(level)}>Reset</button>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={checkGuess}
+        disabled={gameOver}
+      >
+        Guess
+      </motion.button>
 
-      <p className={`message ${message.includes("Won") ? "win" : "lose"}`}>{message}</p>
+      <motion.button
+        className="reset"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => resetGame(level)}
+      >
+        Reset
+      </motion.button>
+
+      <motion.p
+        className={`message ${message.includes("Won") ? "win" : "lose"}`}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {message}
+      </motion.p>
 
       {!gameOver && <p className="hint">{hint}</p>}
 
-      <p className="attempts">Attempts: {attempts} / {maxAttempts}</p>
+      <p className="attempts">
+        Attempts: {attempts} / {maxAttempts}
+      </p>
 
       {history.length > 0 && (
         <div className="history">
           <p>Previous Guesses</p>
           <div className="history-list">
             {history.map((num, index) => (
-              <span key={index}>{num}</span>
+              <motion.span
+                key={index}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {num}
+              </motion.span>
             ))}
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
 
